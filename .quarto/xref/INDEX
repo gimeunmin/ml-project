@@ -1,8 +1,17 @@
 {
+  "20250722.ipynb": {
+    "20250722.html": "81230657"
+  },
   "about.qmd": {
-    "about.html": "3ffe0349"
+    "about.html": "6a0e3308"
   },
   "index.qmd": {
-    "index.html": "abbbc7f0"
+    "index.html": "7f2013c1"
+  },
+  "project1.ipynb": {
+    "project1.html": "f8fed0a0"
+  },
+  "project2.ipynb": {
+    "project2.html": "d75d5c0f"
   }
 }

@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>project1 : 주택 가격 예측 – ml-project</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-dfb324f25d9b1687192fa8be62ac8f9c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">ml-project</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./20250722.html"> 
+<span class="menu-text">Exercise</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./project1.html" aria-current="page"> 
+<span class="menu-text">Project1</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./project2.html"> 
+<span class="menu-text">Project2</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#데이터" id="toc-데이터" class="nav-link active" data-scroll-target="#데이터">데이터</a></li>
+  <li><a href="#데이터-전처리-훈련-데이터와-평가-데이터로-분할-73-비율" id="toc-데이터-전처리-훈련-데이터와-평가-데이터로-분할-73-비율" class="nav-link" data-scroll-target="#데이터-전처리-훈련-데이터와-평가-데이터로-분할-73-비율">데이터 전처리 : 훈련 데이터와 평가 데이터로 분할 (7:3 비율)</a>
+  <ul class="collapse">
+  <li><a href="#단위-달러" id="toc-단위-달러" class="nav-link" data-scroll-target="#단위-달러">단위 : 달러</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">project1 : 주택 가격 예측</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="데이터" class="level2">
+<h2 class="anchored" data-anchor-id="데이터">데이터</h2>
+<ul>
+<li>scikit-learn에서 제공하는 캘리포니아 주택 가격 데이터</li>
+<li>1990년대 캘리포니아 지역의 주택 가격에 대한 데이터</li>
+<li>총 20,640개의 관측값과 8개의 독립변수(feature), 1개의 종속변수(target)으로 구성됨</li>
+</ul>
+<div id="87013108-5c33-4127-9f46-ffa0b3c3229d" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> fetch_california_housing</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> fetch_california_housing(as_frame<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8dcef540-99cc-4362-a0ea-9905dfe1cfdc" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> data.frame <span class="co"># 표 형태로 바꾸기</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">MedInc</th>
+<th data-quarto-table-cell-role="th">HouseAge</th>
+<th data-quarto-table-cell-role="th">AveRooms</th>
+<th data-quarto-table-cell-role="th">AveBedrms</th>
+<th data-quarto-table-cell-role="th">Population</th>
+<th data-quarto-table-cell-role="th">AveOccup</th>
+<th data-quarto-table-cell-role="th">Latitude</th>
+<th data-quarto-table-cell-role="th">Longitude</th>
+<th data-quarto-table-cell-role="th">MedHouseVal</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>8.3252</td>
+<td>41.0</td>
+<td>6.984127</td>
+<td>1.023810</td>
+<td>322.0</td>
+<td>2.555556</td>
+<td>37.88</td>
+<td>-122.23</td>
+<td>4.526</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>8.3014</td>
+<td>21.0</td>
+<td>6.238137</td>
+<td>0.971880</td>
+<td>2401.0</td>
+<td>2.109842</td>
+<td>37.86</td>
+<td>-122.22</td>
+<td>3.585</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>7.2574</td>
+<td>52.0</td>
+<td>8.288136</td>
+<td>1.073446</td>
+<td>496.0</td>
+<td>2.802260</td>
+<td>37.85</td>
+<td>-122.24</td>
+<td>3.521</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>5.6431</td>
+<td>52.0</td>
+<td>5.817352</td>
+<td>1.073059</td>
+<td>558.0</td>
+<td>2.547945</td>
+<td>37.85</td>
+<td>-122.25</td>
+<td>3.413</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>3.8462</td>
+<td>52.0</td>
+<td>6.281853</td>
+<td>1.081081</td>
+<td>565.0</td>
+<td>2.181467</td>
+<td>37.85</td>
+<td>-122.25</td>
+<td>3.422</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="192a5e49-ed2c-44c3-be26-5a9538c06882" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 데이터 확인</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 20640 entries, 0 to 20639
+Data columns (total 9 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   MedInc       20640 non-null  float64
+ 1   HouseAge     20640 non-null  float64
+ 2   AveRooms     20640 non-null  float64
+ 3   AveBedrms    20640 non-null  float64
+ 4   Population   20640 non-null  float64
+ 5   AveOccup     20640 non-null  float64
+ 6   Latitude     20640 non-null  float64
+ 7   Longitude    20640 non-null  float64
+ 8   MedHouseVal  20640 non-null  float64
+dtypes: float64(9)
+memory usage: 1.4 MB</code></pre>
+</div>
+</div>
+<div id="5ea39467-10df-4de1-8655-ef7d8636b61f" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 데이터 전처리 : 결측값 확인</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df.isna().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>MedInc         0
+HouseAge       0
+AveRooms       0
+AveBedrms      0
+Population     0
+AveOccup       0
+Latitude       0
+Longitude      0
+MedHouseVal    0
+dtype: int64</code></pre>
+</div>
+</div>
+</section>
+<section id="데이터-전처리-훈련-데이터와-평가-데이터로-분할-73-비율" class="level1">
+<h1>데이터 전처리 : 훈련 데이터와 평가 데이터로 분할 (7:3 비율)</h1>
+<p>california = fetch_california_housing() X = california.data y = california.target</p>
+<p>from sklearn.model_selection import train_test_split X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)+ 캘리포니아 주택 가격 데이터를 확인한 결과, 관측값은 20,640개, 변수는 9개로 나타남 + 주택 가격에 영향을 미치는 특성은 다음과 같음 + MedInc : 지역 중위 소득 (10,000 USD) + HouseAge : 주택 연식 (건축 후 경과된 연도 수) + AveRooms : 가구당 평균 방 개수 + AveBedrms : 가구당 평균 침실 개수 + Population : 지역 내 인구 수 + AveOccup : 가구당 평균 거주 인원 수 + Latitude : 위도 + Longitude : 경도 + MedHouseVal : 주택 중위 가격 (100,000 USD)</p>
+<div id="96144f75-7188-46bd-8c59-f74cd664a77b" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 데이터 전처리 : 훈련 데이터와 평가 데이터로 분할 (7:3 비율)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>california <span class="op">=</span> fetch_california_housing()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> california.data</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> california.target</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="fl">0.3</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="단위-달러" class="level2">
+<h2 class="anchored" data-anchor-id="단위-달러">단위 : 달러</h2>
+<ul>
+<li>표준편차 : 11만</li>
+<li>중위 주택 가격의 평균 : 20만</li>
+<li>중위 주택 가격 m : 1만 4천, q1 : 11만 9천, 중앙값 : 17만 9천, q3 : 26만, M : 50만</li>
+</ul>
+<div id="a4c5fdbd-9759-4062-a58d-3ca113f3a608" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 요약 통계량 확인</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>df_train <span class="op">=</span> pd.DataFrame(data<span class="op">=</span>X_train, columns<span class="op">=</span>california.feature_names)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>df_train[<span class="st">'MedHouseVal'</span>] <span class="op">=</span> y_train</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>df_train.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">MedInc</th>
+<th data-quarto-table-cell-role="th">HouseAge</th>
+<th data-quarto-table-cell-role="th">AveRooms</th>
+<th data-quarto-table-cell-role="th">AveBedrms</th>
+<th data-quarto-table-cell-role="th">Population</th>
+<th data-quarto-table-cell-role="th">AveOccup</th>
+<th data-quarto-table-cell-role="th">Latitude</th>
+<th data-quarto-table-cell-role="th">Longitude</th>
+<th data-quarto-table-cell-role="th">MedHouseVal</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>14448.000000</td>
+<td>14448.000000</td>
+<td>14448.000000</td>
+<td>14448.000000</td>
+<td>14448.000000</td>
+<td>14448.000000</td>
+<td>14448.000000</td>
+<td>14448.000000</td>
+<td>14448.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">mean</td>
+<td>3.876892</td>
+<td>28.575374</td>
+<td>5.438125</td>
+<td>1.098033</td>
+<td>1427.927326</td>
+<td>3.119236</td>
+<td>35.650669</td>
+<td>-119.584102</td>
+<td>2.069240</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">std</td>
+<td>1.904908</td>
+<td>12.613634</td>
+<td>2.453569</td>
+<td>0.447498</td>
+<td>1140.225190</td>
+<td>12.373636</td>
+<td>2.135742</td>
+<td>2.002930</td>
+<td>1.157492</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">min</td>
+<td>0.499900</td>
+<td>1.000000</td>
+<td>0.888889</td>
+<td>0.333333</td>
+<td>3.000000</td>
+<td>0.692308</td>
+<td>32.550000</td>
+<td>-124.350000</td>
+<td>0.149990</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25%</td>
+<td>2.567225</td>
+<td>18.000000</td>
+<td>4.448928</td>
+<td>1.006783</td>
+<td>791.000000</td>
+<td>2.430380</td>
+<td>33.940000</td>
+<td>-121.800000</td>
+<td>1.193000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">50%</td>
+<td>3.539100</td>
+<td>29.000000</td>
+<td>5.232422</td>
+<td>1.049492</td>
+<td>1168.000000</td>
+<td>2.817147</td>
+<td>34.270000</td>
+<td>-118.510000</td>
+<td>1.793000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">75%</td>
+<td>4.758075</td>
+<td>37.000000</td>
+<td>6.060692</td>
+<td>1.100328</td>
+<td>1727.000000</td>
+<td>3.279135</td>
+<td>37.720000</td>
+<td>-118.010000</td>
+<td>2.646000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">max</td>
+<td>15.000100</td>
+<td>52.000000</td>
+<td>141.909091</td>
+<td>25.636364</td>
+<td>35682.000000</td>
+<td>1243.333333</td>
+<td>41.950000</td>
+<td>-114.310000</td>
+<td>5.000010</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="1b147389-0f7d-44fc-924a-c1971a271483" class="cell" data-execution_count="51">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">4</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sns.histplot(df_train[<span class="st">'MedHouseVal'</span>], color<span class="op">=</span><span class="st">'purple'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project1_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="8e80f0f2-6588-423a-a3c4-967777ac1bea" class="cell" data-execution_count="54">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">1</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(x<span class="op">=</span><span class="st">'MedHouseVal'</span>, color<span class="op">=</span><span class="st">'m'</span>, data<span class="op">=</span>df_train)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project1_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="b46af211-9757-45a1-83f1-c26d97757f0a" class="cell" data-execution_count="48">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 산점도</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>sns.pairplot(df_train, height<span class="op">=</span><span class="fl">0.8</span>, plot_kws<span class="op">=</span>{<span class="st">'s'</span>: <span class="dv">5</span>}, diag_kind<span class="op">=</span><span class="st">'kde'</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project1_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="aa953380-c5cd-445e-a833-5556e2c0c94f" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df_train</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">MedInc</th>
+<th data-quarto-table-cell-role="th">HouseAge</th>
+<th data-quarto-table-cell-role="th">AveRooms</th>
+<th data-quarto-table-cell-role="th">AveBedrms</th>
+<th data-quarto-table-cell-role="th">Population</th>
+<th data-quarto-table-cell-role="th">AveOccup</th>
+<th data-quarto-table-cell-role="th">Latitude</th>
+<th data-quarto-table-cell-role="th">Longitude</th>
+<th data-quarto-table-cell-role="th">MedHouseVal</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>4.1312</td>
+<td>35.0</td>
+<td>5.882353</td>
+<td>0.975490</td>
+<td>1218.0</td>
+<td>2.985294</td>
+<td>33.93</td>
+<td>-118.02</td>
+<td>1.93800</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2.8631</td>
+<td>20.0</td>
+<td>4.401210</td>
+<td>1.076613</td>
+<td>999.0</td>
+<td>2.014113</td>
+<td>32.79</td>
+<td>-117.09</td>
+<td>1.69700</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>4.2026</td>
+<td>24.0</td>
+<td>5.617544</td>
+<td>0.989474</td>
+<td>731.0</td>
+<td>2.564912</td>
+<td>34.59</td>
+<td>-120.14</td>
+<td>2.59800</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3.1094</td>
+<td>14.0</td>
+<td>5.869565</td>
+<td>1.094203</td>
+<td>302.0</td>
+<td>2.188406</td>
+<td>39.26</td>
+<td>-121.00</td>
+<td>1.36100</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>3.3068</td>
+<td>52.0</td>
+<td>4.801205</td>
+<td>1.066265</td>
+<td>1526.0</td>
+<td>2.298193</td>
+<td>37.77</td>
+<td>-122.45</td>
+<td>5.00001</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14443</td>
+<td>6.3700</td>
+<td>35.0</td>
+<td>6.129032</td>
+<td>0.926267</td>
+<td>658.0</td>
+<td>3.032258</td>
+<td>33.78</td>
+<td>-117.96</td>
+<td>2.29200</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">14444</td>
+<td>3.0500</td>
+<td>33.0</td>
+<td>6.868597</td>
+<td>1.269488</td>
+<td>1753.0</td>
+<td>3.904232</td>
+<td>34.02</td>
+<td>-117.43</td>
+<td>0.97800</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14445</td>
+<td>2.9344</td>
+<td>36.0</td>
+<td>3.986717</td>
+<td>1.079696</td>
+<td>1756.0</td>
+<td>3.332068</td>
+<td>34.03</td>
+<td>-118.38</td>
+<td>2.22100</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">14446</td>
+<td>5.7192</td>
+<td>15.0</td>
+<td>6.395349</td>
+<td>1.067979</td>
+<td>1777.0</td>
+<td>3.178891</td>
+<td>37.58</td>
+<td>-121.96</td>
+<td>2.83500</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14447</td>
+<td>2.5755</td>
+<td>52.0</td>
+<td>3.402576</td>
+<td>1.058776</td>
+<td>2619.0</td>
+<td>2.108696</td>
+<td>37.77</td>
+<td>-122.42</td>
+<td>3.25000</td>
+</tr>
+</tbody>
+</table>
+
+<p>14448 rows × 9 columns</p>
+</div>
+</div>
+</div>
+<div id="c4e04827-bdb2-48e8-b271-5b886765efa9" class="cell" data-execution_count="46">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 상관분석</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>corr_train <span class="op">=</span> df_train.corr()</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>upp_mat <span class="op">=</span> np.triu(corr_train)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">9</span>))</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>sns.heatmap(corr_train, annot<span class="op">=</span><span class="va">True</span>, mask<span class="op">=</span>upp_mat, cmap<span class="op">=</span><span class="st">'bwr'</span>, vmin<span class="op">=-</span><span class="dv">1</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Correlation Matrix'</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project1_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>중위 주택 가격은 지역 중위 소득과 강한 양의 상관관계 존재</li>
+<li>또한 주택 연식, 가구당 평균 방 개수, 위도 간에도 약한 양의 상관관계</li>
+<li>중위 주택 가격을 예측하는 특성으로 해당 변수 선택</li>
+</ul>
+<div id="af182966-4916-4267-a312-a349cbc0db8c" class="cell" data-execution_count="73">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 상관관계가 강한 독립변수 선택</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># scikit-learn에서 입력 데이터(feature)를 2차원 배열로 요구함</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>features <span class="op">=</span> [<span class="st">'MedInc'</span>, <span class="st">'HouseAge'</span>, <span class="st">'AveRooms'</span>, <span class="st">'Latitude'</span>]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> <span class="st">'MedHouseVal'</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> df_train[features]</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> df_train[target]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8fb8e669-4d1e-49d5-92a6-48afa83b7fe1" class="cell" data-execution_count="74">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 평가 데이터에서도 훈련 데이터에서 사용한 독립변수만 선택</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>df_test <span class="op">=</span> pd.DataFrame(data<span class="op">=</span>X_test, columns<span class="op">=</span>california.feature_names)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>df_test[<span class="st">'MedHouseVal'</span>] <span class="op">=</span> y_test</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> df_test[features]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="6969aeb7-4eb2-4c02-8398-f08b6e2081e9" class="cell" data-execution_count="75">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 선형 회귀모델 생성 및 학습</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> LinearRegression()</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>model.fit(X_train, y_train)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 회귀모델 평가 : 결정계수, MSE</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error, r2_score</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> model.predict(X_test)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>R2 <span class="op">=</span> r2_score(y_test, y_pred)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>RMSE <span class="op">=</span> np.sqrt(mean_squared_error(y_test, y_pred))</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"결정계수 : </span><span class="sc">{</span>R2<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"RMSE : </span><span class="sc">{</span>RMSE<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>결정계수 : 0.520
+RMSE : 0.794</code></pre>
+</div>
+</div>
+<div id="c2f5b422-e774-489b-a1f7-a2a00e47973e" class="cell" data-execution_count="78">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 회귀계수</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>df_coef <span class="op">=</span> pd.DataFrame({<span class="st">'Feature'</span>: features, <span class="st">'Coefficient'</span>: model.coef_})</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>(df_coef)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="78">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Feature</th>
+<th data-quarto-table-cell-role="th">Coefficient</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>MedInc</td>
+<td>0.435658</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>HouseAge</td>
+<td>0.016937</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>AveRooms</td>
+<td>-0.019505</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Latitude</td>
+<td>-0.045071</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<ul>
+<li>회귀계수를 살펴보면 지역 중위 소득이 1만 달러 증가할수록 중위 주택 가격은 4만 3천 달러 증가하는 것으로 나타남. 이는 경제적으로 여유가 있을수록 좋은 집에 거주함을 경햐이 있음을 보임</li>
+<li>주택 연식이 1년 증가하면 중위 주택 가격은 1693달러 증가하는 것으로 나타남</li>
+<li>가구당 평균 방 개수가 1개 증가하면 중위주택 가격은 1950달러 감소함</li>
+<li>위도가 1도 증가하면 중위 주택 가격은 4507달러 감소하는 경향이 있음. 이는 일반적으로 캘리포니아주는 남부 지역이 상대적으로 대도시가 많아 주택 가격이 더 높은 것을 반영하는 것으로 판단됨</li>
+</ul>
+<div id="750cce77-fa97-42d4-b351-55a21a269cc1" class="cell" data-execution_count="82">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># statsmodels 라이브러리 설치</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#!pip install statsmodels</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="9ac73362-8843-48f2-9015-2d6bb393eb15" class="cell" data-execution_count="85">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># [참고] 회귀계수의 유의성</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>X_train_const <span class="op">=</span> sm.add_constant(X_train)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>ols_model <span class="op">=</span> sm.OLS(y_train, X_train_const).fit()</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ols_model.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:            MedHouseVal   R-squared:                       0.519
+Model:                            OLS   Adj. R-squared:                  0.518
+Method:                 Least Squares   F-statistic:                     3890.
+Date:                Thu, 24 Jul 2025   Prob (F-statistic):               0.00
+Time:                        11:50:47   Log-Likelihood:                -17332.
+No. Observations:               14448   AIC:                         3.467e+04
+Df Residuals:                   14443   BIC:                         3.471e+04
+Df Model:                           4                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          1.6091      0.115     13.957      0.000       1.383       1.835
+MedInc         0.4357      0.004    116.405      0.000       0.428       0.443
+HouseAge       0.0169      0.001     31.487      0.000       0.016       0.018
+AveRooms      -0.0195      0.003     -6.652      0.000      -0.025      -0.014
+Latitude      -0.0451      0.003    -14.213      0.000      -0.051      -0.039
+==============================================================================
+Omnibus:                     3079.717   Durbin-Watson:                   1.979
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):             8182.373
+Skew:                           1.148   Prob(JB):                         0.00
+Kurtosis:                       5.884   Cond. No.                         809.
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
+</div>
+</div>
+<div id="323ee6e7-b871-4be5-85d1-f7e5dfc3fdf9" class="cell" data-execution_count="86">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> X_test[features]</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> model.predict(X_test)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># RMSE, 결정계수</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error, r2_score</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>RMSE <span class="op">=</span> np.sqrt(mean_squared_error(y_test, y_pred))</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>R2 <span class="op">=</span> r2_score(y_test, y_pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>RMSE는 0.794로, 주택 중위 가격의 실제값과 예측값이 평균적으로 약 8만 달러 차이가 있다는 것을 의미함</li>
+<li>학습 데이터에서 주택 중위 가격의 평균이 약 20만 달러인 점을 고려하면, 모델의 평균 오차는 약 30% 수준임을 알 수 있음</li>
+<li>따라서 평균 오차가 비교적 큰 편이므로, 모델 성능 개선이 필요한 것으로 판단됨</li>
+<li>결정계수는 52.0%로 나타남</li>
+</ul>
+<div id="ab7f92f4-1415-49b8-b0b7-f10258c8b603" class="cell" data-execution_count="87">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="451da9c4-5294-414f-bcf1-c3aae00af588" class="cell" data-execution_count="108">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> sns.load_dataset(<span class="st">"iris"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="90a683d3-39ce-4bcd-996b-4d79c487154b" class="cell" data-execution_count="109">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="109">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">sepal_length</th>
+<th data-quarto-table-cell-role="th">sepal_width</th>
+<th data-quarto-table-cell-role="th">petal_length</th>
+<th data-quarto-table-cell-role="th">petal_width</th>
+<th data-quarto-table-cell-role="th">species</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>5.1</td>
+<td>3.5</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>4.9</td>
+<td>3.0</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>4.7</td>
+<td>3.2</td>
+<td>1.3</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4.6</td>
+<td>3.1</td>
+<td>1.5</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5.0</td>
+<td>3.6</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">145</td>
+<td>6.7</td>
+<td>3.0</td>
+<td>5.2</td>
+<td>2.3</td>
+<td>virginica</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">146</td>
+<td>6.3</td>
+<td>2.5</td>
+<td>5.0</td>
+<td>1.9</td>
+<td>virginica</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">147</td>
+<td>6.5</td>
+<td>3.0</td>
+<td>5.2</td>
+<td>2.0</td>
+<td>virginica</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">148</td>
+<td>6.2</td>
+<td>3.4</td>
+<td>5.4</td>
+<td>2.3</td>
+<td>virginica</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">149</td>
+<td>5.9</td>
+<td>3.0</td>
+<td>5.1</td>
+<td>1.8</td>
+<td>virginica</td>
+</tr>
+</tbody>
+</table>
+
+<p>150 rows × 5 columns</p>
+</div>
+</div>
+</div>
+<div id="9c9773a2-bdd5-4e7c-88c3-2d15442c7ed8" class="cell" data-execution_count="110">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 150 entries, 0 to 149
+Data columns (total 5 columns):
+ #   Column        Non-Null Count  Dtype  
+---  ------        --------------  -----  
+ 0   sepal_length  150 non-null    float64
+ 1   sepal_width   150 non-null    float64
+ 2   petal_length  150 non-null    float64
+ 3   petal_width   150 non-null    float64
+ 4   species       150 non-null    object 
+dtypes: float64(4), object(1)
+memory usage: 6.0+ KB</code></pre>
+</div>
+</div>
+<div id="f59eca51-cfa8-4706-9191-d9ea294f88e0" class="cell" data-execution_count="111">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>df.isna().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="111">
+<pre><code>sepal_length    0
+sepal_width     0
+petal_length    0
+petal_width     0
+species         0
+dtype: int64</code></pre>
+</div>
+</div>
+<div id="32a2fd46-27e1-45f0-9f90-f9d8d0c91307" class="cell" data-execution_count="114">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df.drop(columns <span class="op">=</span> <span class="st">"species"</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df[<span class="st">"species"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="d67f805e-8af4-4eea-87aa-4f41f7b95e57" class="cell" data-execution_count="116">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="fl">0.3</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="073c480d-a446-481b-b190-c7e0d9806314" class="cell" data-execution_count="117">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>df_train <span class="op">=</span> pd.concat([X_train, y_train], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>sns.boxplot(x<span class="op">=</span><span class="st">'species'</span>, y<span class="op">=</span><span class="st">'sepal_length'</span>, data<span class="op">=</span>df_train)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">''</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="117">
+<pre><code>Text(0, 0.5, '')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project1_files/figure-html/cell-29-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="f560ca3a-f003-4db3-b286-9f49da270c76" class="cell" data-execution_count="118">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>sns.pairplot(X_train, height<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project1_files/figure-html/cell-30-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="8605f63d-3c64-4c60-a4ae-972095457345" class="cell" data-execution_count="119">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">3</span>))</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>sns.boxplot(y<span class="op">=</span><span class="st">'species'</span>, x<span class="op">=</span><span class="st">'sepal_length'</span>, hue<span class="op">=</span><span class="st">'species'</span>, data<span class="op">=</span>df_train)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">''</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="119">
+<pre><code>Text(0, 0.5, '')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project1_files/figure-html/cell-31-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="fc87fcd3-f606-47a4-8751-86d2f11dab98" class="cell" data-execution_count="120">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>sns.pairplot(df_train, hue<span class="op">=</span><span class="st">'species'</span>, height<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="project1_files/figure-html/cell-32-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="8d6f9c1c-f157-494a-8c7d-c3a3e15a7f85" class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="d98bd560-6bc5-4acb-a218-f3c91372ddde" class="cell" data-execution_count="141">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> KNeighborsClassifier</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>k_range <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">20</span>, <span class="dv">2</span>)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>k_score <span class="op">=</span> []</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> k_range(<span class="dv">1</span>, <span class="dv">2</span>):</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    knn <span class="op">=</span> KNeighborsClassifier(n_neighbors<span class="op">=</span>k)</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>    scores <span class="op">=</span> cross_val_score(knn, X_train, y_train, cv<span class="op">=</span><span class="dv">5</span>, scoring<span class="op">=</span><span class="st">'accuracy'</span>)</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    k_scores.append(scores.mean())</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'k=</span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">일 때 정확도 : </span><span class="sc">{</span>scores<span class="sc">.</span>mean()<span class="sc">:.3f}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg ansi-bold">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg ansi-bold">TypeError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg ansi-bold">&lt;ipython-input-141-e4abced1d2fc&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">      5</span> k_score <span class="ansi-yellow-fg ansi-bold">=</span> <span class="ansi-yellow-fg ansi-bold">[</span><span class="ansi-yellow-fg ansi-bold">]</span>
+<span class="ansi-green-fg">      6</span> 
+<span class="ansi-green-fg ansi-bold">----&gt; 7</span><span class="ansi-yellow-fg ansi-bold"> </span><span class="ansi-green-fg ansi-bold">for</span> k <span class="ansi-green-fg ansi-bold">in</span> k_range<span class="ansi-yellow-fg ansi-bold">(</span><span class="ansi-cyan-fg ansi-bold">1</span><span class="ansi-yellow-fg ansi-bold">,</span> <span class="ansi-cyan-fg ansi-bold">2</span><span class="ansi-yellow-fg ansi-bold">)</span><span class="ansi-yellow-fg ansi-bold">:</span>
+<span class="ansi-green-fg">      8</span>     knn <span class="ansi-yellow-fg ansi-bold">=</span> KNeighborsClassifier<span class="ansi-yellow-fg ansi-bold">(</span>n_neighbors<span class="ansi-yellow-fg ansi-bold">=</span>k<span class="ansi-yellow-fg ansi-bold">)</span>
+<span class="ansi-green-fg">      9</span>     scores <span class="ansi-yellow-fg ansi-bold">=</span> cross_val_score<span class="ansi-yellow-fg ansi-bold">(</span>knn<span class="ansi-yellow-fg ansi-bold">,</span> X_train<span class="ansi-yellow-fg ansi-bold">,</span> y_train<span class="ansi-yellow-fg ansi-bold">,</span> cv<span class="ansi-yellow-fg ansi-bold">=</span><span class="ansi-cyan-fg ansi-bold">5</span><span class="ansi-yellow-fg ansi-bold">,</span> scoring<span class="ansi-yellow-fg ansi-bold">=</span><span class="ansi-blue-fg ansi-bold">'accuracy'</span><span class="ansi-yellow-fg ansi-bold">)</span>
+
+<span class="ansi-red-fg ansi-bold">TypeError</span>: 'range' object is not callable</pre>
+</div>
+</div>
+</div>
+<div id="821fcd1b-b6af-44b4-a864-460945d13d5d" class="cell" data-execution_count="127">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>best_k <span class="op">=</span> k_range[k_scores.index(<span class="bu">max</span>(k_scores))]</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"최적의 k의 값은 </span><span class="sc">{</span>best_k<span class="sc">}</span><span class="ss">이며, 평균 정확도는 </span><span class="sc">{</span><span class="bu">max</span>(k_scores)<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-cyan-fg ansi-bold">  File </span><span class="ansi-green-fg ansi-bold">"&lt;ipython-input-127-464914cff1ed&gt;"</span><span class="ansi-cyan-fg ansi-bold">, line </span><span class="ansi-green-fg ansi-bold">2</span>
+<span class="ansi-yellow-fg ansi-bold">    print(f"최적의 k의 값은 {best_k}이며, 평균 정확도는 {max(k_scores):.3f}</span>
+<span class="ansi-white-fg ansi-bold">                                                             ^</span>
+<span class="ansi-red-fg ansi-bold">SyntaxError</span><span class="ansi-red-fg ansi-bold">:</span> EOL while scanning string literal
+</pre>
+</div>
+</div>
+</div>
+<div id="f02f1069-d2bd-4012-99e2-f56bfc27c975" class="cell" data-execution_count="132">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>knn <span class="op">=</span> <span class="im">from</span> sklearn.neighbors <span class="im">import</span> KNeighborsClassifier(n_neighbors<span class="op">=</span>k)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>knn.flt(X_train, y_train)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> knn.predict(X_test)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> accuracy_score(y_test, y_pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-cyan-fg ansi-bold">  File </span><span class="ansi-green-fg ansi-bold">"&lt;ipython-input-132-478f26fe98a6&gt;"</span><span class="ansi-cyan-fg ansi-bold">, line </span><span class="ansi-green-fg ansi-bold">1</span>
+<span class="ansi-yellow-fg ansi-bold">    knn = from sklearn.neighbors import KNeighborsClassifier(n_neighbors=k)</span>
+<span class="ansi-white-fg ansi-bold">          ^</span>
+<span class="ansi-red-fg ansi-bold">SyntaxError</span><span class="ansi-red-fg ansi-bold">:</span> invalid syntax
+</pre>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
